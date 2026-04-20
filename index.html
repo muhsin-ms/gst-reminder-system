@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Client Follow-up Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar-item { transition: all 0.3s ease; }
+        .sidebar-item:hover { transform: translateX(5px); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .status-badge { transition: all 0.2s ease; }
+        .btn-action { transition: all 0.2s ease; }
+        .btn-action:hover { transform: scale(1.05); }
+        .modal-backdrop { backdrop-filter: blur(5px); }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-chart-line text-green-600 text-2xl"></i>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">GST Client Follow-up System</h1>
+                    <p class="text-sm text-gray-600">Kisgston Association - Kerala</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Language Toggle -->
+                <button id="langToggle" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    <i class="fas fa-globe mr-2"></i>
+                    <span id="langText">English</span>
+                </button>
+                <!-- Current Date -->
+                <div class="text-gray-600">
+                    <i class="far fa-calendar mr-2"></i>
+                    <span id="currentDate"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-screen pt-16">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg border-r border-gray-200">
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <button onclick="showSection('dashboard')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg bg-green-50 text-green-700 font-medium" id="dashboardBtn">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            <span data-en="Dashboard" data-ml="ഡാഷ്ബോർഡ്">Dashboard</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('followups')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700" id="followupsBtn">
+                            <i class="fas fa-bell mr-3"></i>
+                            <span data-en="Today's Follow-ups" data-ml="ഇന്നത്തെ പിന്തുടർച്ച">Today's Follow-ups</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('clients')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700" id="clientsBtn">
+                            <i class="fas fa-users mr-3"></i>
+                            <span data-en="Client Management" data-ml="ക്ലയന്റ് മാനേജ്മെന്റ്">Client Management</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('business')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700" id="businessBtn">
+                            <i class="fas fa-briefcase mr-3"></i>
+                            <span data-en="Business Tools" data-ml="ബിസിനസ് ടൂൾസ്">Business Tools</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('kerala')" class="sidebar-item w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700" id="keralaBtn">
+                            <i class="fas fa-map-marked-alt mr-3"></i>
+                            <span data-en="Kerala GST" data-ml="കേരള GST">Kerala GST</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="p-6">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" data-en="Dashboard Overview" data-ml="ഡാഷ്ബോർഡ് അവലോകനം">Dashboard Overview</h2>
+                    <p class="text-gray-600" data-en="Track your GST client follow-ups efficiently" data-ml="നിങ്ങളുടെ GST ക്ലയന്റ് പിന്തുടർച്ച കാര്യക്ഷമമായി ട്രാക്ക് ചെയ്യുക">Track your GST client follow-ups efficiently</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium" data-en="Total Clients" data-ml="ആകെ ക്ലയന്റുകൾ">Total Clients</p>
+                                <p class="text-3xl font-bold text-gray-800 mt-2" id="totalClients">0</p>
+                            </div>
+                            <div class="bg-blue-100 rounded-full p-3">
+                                <i class="fas fa-users text-blue-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium" data-en="Due Today" data-ml="ഇന്ന് അടയ്ക്കേണ്ടത്">Due Today</p>
+                                <p class="text-3xl font-bold text-gray-800 mt-2" id="dueToday">0</p>
+                            </div>
+                            <div class="bg-yellow-100 rounded-full p-3">
+                                <i class="fas fa-calendar-day text-yellow-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium" data-en="Due in 3 Days" data-ml="3 ദിവസത്തിൽ അടയ്ക്കേണ്ടത്">Due in 3 Days</p>
+                                <p class="text-3xl font-bold text-gray-800 mt-2" id="dueInThreeDays">0</p>
+                            </div>
+                            <div class="bg-orange-100 rounded-full p-3">
+                                <i class="fas fa-clock text-orange-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-600 text-sm font-medium" data-en="Overdue" data-ml="കാലഹരണപ്പെട്ടത്">Overdue</p>
+                                <p class="text-3xl font-bold text-gray-800 mt-2" id="overdue">0</p>
+                            </div>
+                            <div class="bg-red-100 rounded-full p-3">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" data-en="Quick Actions" data-ml="വേഗത്തിലുള്ള പ്രവർത്തനങ്ങൾ">Quick Actions</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="openAddClientModal()" class="btn-action px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span data-en="Add New Client" data-ml="പുതിയ ക്ലയന്റ് ചേർക്കുക">Add New Client</span>
+                        </button>
+                        <button onclick="showSection('followups')" class="btn-action px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-bell mr-2"></i>
+                            <span data-en="View Follow-ups" data-ml="പിന്തുടർച്ച കാണുക">View Follow-ups</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Follow-ups Section -->
+            <section id="followups" class="p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" data-en="Today's Follow-ups" data-ml="ഇന്നത്തെ പിന്തുടർച്ച">Today's Follow-ups</h2>
+                    <p class="text-gray-600" data-en="Clients who need your attention today" data-ml="ഇന്ന് നിങ്ങളുടെ ശ്രദ്ധ ആവശ്യമുള്ള ക്ലയന്റുകൾ">Clients who need your attention today</p>
+                </div>
+
+                <div id="followupsList" class="space-y-4">
+                    <!-- Follow-up items will be populated here -->
+                </div>
+            </section>
+
+            <!-- Clients Section -->
+            <section id="clients" class="p-6 hidden">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2" data-en="Client Management" data-ml="ക്ലയന്റ് മാനേജ്മെന്റ്">Client Management</h2>
+                        <p class="text-gray-600" data-en="Manage all your GST clients" data-ml="നിങ്ങളുടെ എല്ലാ GST ക്ലയന്റുകളെയും നിയന്ത്രിക്കുക">Manage all your GST clients</p>
+                    </div>
+                    <button onclick="openAddClientModal()" class="btn-action px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span data-en="Add Client" data-ml="ക്ലയന്റ് ചേർക്കുക">Add Client</span>
+                    </button>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <input type="text" id="searchInput" placeholder="Search clients..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                   data-en-placeholder="Search clients..." data-ml-placeholder="ക്ലയന്റുകളെ തിരയുക...">
+                        </div>
+                        <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="all" data-en="All Status" data-ml="എല്ലാ നില">All Status</option>
+                            <option value="pending" data-en="Pending" data-ml="തീർപ്പാക്കാത്തത്">Pending</option>
+                            <option value="reminded" data-en="Reminded" data-ml="ഓർമ്മപ്പെടുത്തിയത്">Reminded</option>
+                            <option value="completed" data-en="Completed" data-ml="പൂർത്തിയാക്കിയത്">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Clients Table -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Business Details" data-ml="Business Details">Business Details</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Contact Info" data-ml="Contact Info">Contact Info</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Service" data-ml="Service">Service</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Due Date" data-ml="Due Date">Due Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Status" data-ml="Status">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-en="Actions" data-ml="Actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientsTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Client rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Business Tools Section -->
+            <section id="business" class="p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" data-en="Business Management Tools" data-ml="Business Management Tools">Business Management Tools</h2>
+                    <p class="text-gray-600" data-en="Manage your GST business operations efficiently" data-ml="Manage your GST business operations efficiently">Manage your GST business operations efficiently</p>
+                </div>
+
+                <!-- Business Tools Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Invoice Tracker -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-blue-100 rounded-full p-3">
+                                <i class="fas fa-file-invoice-dollar text-blue-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="Invoice Tracker" data-ml="Invoice Tracker">Invoice Tracker</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="Track client invoices and payments" data-ml="Track client invoices and payments">Track client invoices and payments</p>
+                        <button onclick="openInvoiceTracker()" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="Open Tracker" data-ml="Open Tracker">Open Tracker</span>
+                        </button>
+                    </div>
+
+                    <!-- GST Calculator -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-green-100 rounded-full p-3">
+                                <i class="fas fa-calculator text-green-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="GST Calculator" data-ml="GST Calculator">GST Calculator</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="Calculate GST amounts instantly" data-ml="Calculate GST amounts instantly">Calculate GST amounts instantly</p>
+                        <button onclick="openGSTCalculator()" class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="Open Calculator" data-ml="Open Calculator">Open Calculator</span>
+                        </button>
+                    </div>
+
+                    <!-- Payment Reminders -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-yellow-100 rounded-full p-3">
+                                <i class="fas fa-bell text-yellow-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="Payment Reminders" data-ml="Payment Reminders">Payment Reminders</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="Set up payment due date alerts" data-ml="Set up payment due date alerts">Set up payment due date alerts</p>
+                        <button onclick="openPaymentReminders()" class="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="Manage Reminders" data-ml="Manage Reminders">Manage Reminders</span>
+                        </button>
+                    </div>
+
+                    <!-- Report Generator -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-purple-100 rounded-full p-3">
+                                <i class="fas fa-chart-bar text-purple-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="Report Generator" data-ml="Report Generator">Report Generator</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="Generate client and business reports" data-ml="Generate client and business reports">Generate client and business reports</p>
+                        <button onclick="openReportGenerator()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="Generate Reports" data-ml="Generate Reports">Generate Reports</span>
+                        </button>
+                    </div>
+
+                    <!-- Tax Calendar -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-red-100 rounded-full p-3">
+                                <i class="fas fa-calendar-alt text-red-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="Tax Calendar" data-ml="Tax Calendar">Tax Calendar</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="View important GST dates and deadlines" data-ml="View important GST dates and deadlines">View important GST dates and deadlines</p>
+                        <button onclick="openTaxCalendar()" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="View Calendar" data-ml="View Calendar">View Calendar</span>
+                        </button>
+                    </div>
+
+                    <!-- Revenue Tracker -->
+                    <div class="card-hover bg-white rounded-xl shadow-md p-6 border-l-4 border-indigo-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="bg-indigo-100 rounded-full p-3">
+                                <i class="fas fa-coins text-indigo-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">Tool</span>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" data-en="Revenue Tracker" data-ml="Revenue Tracker">Revenue Tracker</h3>
+                        <p class="text-gray-600 text-sm mb-4" data-en="Track business revenue and growth" data-ml="Track business revenue and growth">Track business revenue and growth</p>
+                        <button onclick="openRevenueTracker()" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                            <i class="fas fa-open mr-2"></i>
+                            <span data-en="Track Revenue" data-ml="Track Revenue">Track Revenue</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Kerala GST Section -->
+            <section id="kerala" class="p-6 hidden">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2" data-en="Kerala GST Compliance" data-ml="Kerala GST Compliance">Kerala GST Compliance</h2>
+                    <p class="text-gray-600" data-en="Kerala-specific GST regulations and tools" data-ml="Kerala-specific GST regulations and tools">Kerala-specific GST regulations and tools</p>
+                </div>
+
+                <!-- Kerala GST Info Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <!-- Kerala GST Info -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-600">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-info-circle text-green-600 text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold text-gray-800" data-en="Kerala GST Information" data-ml="Kerala GST Information">Kerala GST Information</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="State Code" data-ml="State Code">State Code</span>
+                                <span class="font-semibold">32</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="GST Rate" data-ml="GST Rate">GST Rate</span>
+                                <span class="font-semibold">State GST: 9%</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="Composition Scheme" data-ml="Composition Scheme">Composition Scheme</span>
+                                <span class="font-semibold">1% (Manufacturers not eligible)</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-gray-600" data-en="Registration Threshold" data-ml="Registration Threshold">Registration Threshold</span>
+                                <span class="font-semibold">Rs. 20 Lakhs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kerala Important Dates -->
+                    <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-600">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-calendar-check text-blue-600 text-2xl mr-3"></i>
+                            <h3 class="text-xl font-semibold text-gray-800" data-en="Kerala GST Important Dates" data-ml="Kerala GST Important Dates">Kerala GST Important Dates</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="GSTR-3B Due" data-ml="GSTR-3B Due">GSTR-3B Due</span>
+                                <span class="font-semibold">20th of every month</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="GSTR-1 Due" data-ml="GSTR-1 Due">GSTR-1 Due</span>
+                                <span class="font-semibold">11th of every month</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b">
+                                <span class="text-gray-600" data-en="GSTR-9 Due" data-ml="GSTR-9 Due">GSTR-9 Due</span>
+                                <span class="font-semibold">31st December</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-gray-600" data-en="CMP-08 Due" data-ml="CMP-08 Due">CMP-08 Due</span>
+                                <span class="font-semibold">18th of April/October</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kerala GST Tools -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" data-en="Kerala GST Quick Tools" data-ml="Kerala GST Quick Tools">Kerala GST Quick Tools</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onclick="generateKeralaReport()" class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-file-download mr-2"></i>
+                            <span data-en="Kerala GST Report" data-ml="Kerala GST Report">Kerala GST Report</span>
+                        </button>
+                        <button onclick="checkKeralaCompliance()" class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span data-en="Compliance Check" data-ml="Compliance Check">Compliance Check</span>
+                        </button>
+                        <button onclick="viewKeralaNotifications()" class="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition">
+                            <i class="fas fa-bell mr-2"></i>
+                            <span data-en="Kerala Notifications" data-ml="Kerala Notifications">Kerala Notifications</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Client Modal -->
+    <div id="clientModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 modal-backdrop">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800" id="modalTitle" data-en="Add New Client" data-ml="പുതിയ ക്ലയന്റ് ചേർക്കുക">Add New Client</h3>
+                    <button onclick="closeClientModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="clientForm">
+                    <input type="hidden" id="clientId">
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Client Name" data-ml="ക്ലയന്റ് പേര്">Client Name</label>
+                        <input type="text" id="clientName" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               data-en-placeholder="Enter client name" data-ml-placeholder="ക്ലയന്റ് പേര് നൽകുക">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Phone Number" data-ml="ഫോൺ നമ്പർ">Phone Number</label>
+                        <input type="tel" id="clientPhone" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                               data-en-placeholder="Enter phone number" data-ml-placeholder="ഫോൺ നമ്പർ നൽകുക">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Service Type" data-ml="സേവന തരം">Service Type</label>
+                        <select id="serviceType" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="GST Filing" data-en="GST Filing" data-ml="GST ഫയലിംഗ്">GST Filing</option>
+                            <option value="GST Registration" data-en="GST Registration" data-ml="GST രജിസ്ട്രേഷൻ">GST Registration</option>
+                            <option value="GST Consultation" data-en="GST Consultation" data-ml="GST കൺസൾട്ടേഷൻ">GST Consultation</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Due Date" data-ml="അടയ്ക്കേണ്ട തീയതി">Due Date</label>
+                        <input type="date" id="dueDate" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Notes (Optional)" data-ml="കുറിപ്പുകൾ (ഓപ്ഷണൽ)">Notes (Optional)</label>
+                        <textarea id="clientNotes" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  data-en-placeholder="Add any additional notes..." data-ml-placeholder="കൂടുതൽ കുറിപ്പുകൾ ചേർക്കുക..."></textarea>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-save mr-2"></i>
+                            <span data-en="Save Client" data-ml="ക്ലയന്റ് സേവ് ചെയ്യുക">Save Client</span>
+                        </button>
+                        <button type="button" onclick="closeClientModal()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                            <span data-en="Cancel" data-ml="റദ്ദാക്കുക">Cancel</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Modal -->
+    <div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 modal-backdrop">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800" data-en="Custom Message" data-ml="ഇഷ്‌ടാനുസൃത സന്ദേശം">Custom Message</h3>
+                    <button onclick="closeMessageModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" data-en="Message Template" data-ml="സന്ദേശ ടെംപ്ലേറ്റ്">Message Template</label>
+                    <select id="messageTemplate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent mb-3">
+                        <option value="default" data-en="Default GST Reminder" data-ml="Default GST Reminder">Default GST Reminder</option>
+                        <option value="urgent" data-en="Urgent Reminder" data-ml="Urgent Reminder">Urgent Reminder</option>
+                        <option value="gstr1" data-en="GSTR-1 Reminder" data-ml="GSTR-1 Reminder">GSTR-1 Reminder</option>
+                        <option value="gstr3b" data-en="GSTR-3B Reminder" data-ml="GSTR-3B Reminder">GSTR-3B Reminder</option>
+                        <option value="custom" data-en="Custom Message" data-ml="Custom Message">Custom Message</option>
+                    </select>
+                    
+                    <textarea id="customMessage" rows="4"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                              data-en-placeholder="Enter your custom message..." data-ml-placeholder="നിങ്ങളുടെ ഇഷ്‌ടാനുസൃത സന്ദേശം നൽകുക..."></textarea>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="sendWhatsAppMessage()" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        <span data-en="Send WhatsApp" data-ml="WhatsApp അയയ്ക്കുക">Send WhatsApp</span>
+                    </button>
+                    <button onclick="closeMessageModal()" class="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        <span data-en="Cancel" data-ml="റദ്ദാക്കുക">Cancel</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
